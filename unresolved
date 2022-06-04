@@ -93,7 +93,7 @@ EOF
 }
 
 case "$ACTION" in
-	""|auto) auto;;
+	""|auto|fix) auto;;
 	disable|stop)
 		auto
 		disable;;
