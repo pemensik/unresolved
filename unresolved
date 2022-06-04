@@ -1,0 +1,104 @@
+#!/bin/sh
+#
+# Attempt to disable or uninstall resolved and fix network immediately
+# Fixes /etc/resolv.conf of resolved
+# After my failed attempt to make resolved own /etc/resolv.conf only when started,
+# provide tool to fix it in single command.
+# https://github.com/systemd/systemd/pull/21257
+
+set -e
+
+RESOLV_CONF=$(realpath /etc/resolv.conf)
+ACTION=${1:-auto}
+SERVERS=
+RESOLVECTL=$(type -p resolvectl 2>/dev/null)
+
+is_nm() {
+	systemctl -q is-active NetworkManager && systemctl -q is-enabled NetworkManager
+}
+
+need_root() {
+if [ "$EUID" != 0 ]; then
+	echo $"Can work only uder root, run me with sudo!"
+	exit 1
+fi
+}
+
+create() {
+	need_root
+if systemctl -q is-active systemd-resolved && [ -x "$RESOLVECTL" ]; then
+	SERVERS=$($RESOLVECTL dns | cut -d: -f2-)
+fi
+
+if is_nm; then
+	if [ -f /run/NetworkManager/no-stub-resolv.conf ]; then
+		(cd /etc && ln -s ../run/NetworkManager/no-stub-resolv.conf resolv.conf)
+		echo $"Network Manager symlink used"
+	fi
+elif ! [ -f /etc/resolv.conf ]; then
+	# Remove dangling symlink to whatever service it is
+	[ -L /etc/resolv.conf ] && rm -f /etc/resolv.conf
+	# prevent systemd claiming /etc/resolv.conf by creating a file
+	echo "# created by unresolved" > /etc/resolv.conf
+	for NS in $SERVERS; do
+		echo "nameserver $NS" >> /etc/resolv.conf
+	done
+	echo $"Created static resolv.conf"
+fi
+}
+
+auto() {
+
+	if [ "$RESOLV_CONF" = "/run/systemd/resolve/stub-resolv.conf" ]; then
+		echo $"resolv.conf is using systemd-resolved stub-resolv.conf, fixing..."
+		need_root
+		rm -f /etc/resolv.conf
+	elif [ "$RESOLV_CONF" = "/run/systemd/resolve/resolv.conf" ]; then
+		echo $"resolv.conf is using systemd-resolved resolv.conf, fixing..."
+		need_root
+		rm -f /etc/resolv.conf
+	fi
+
+	if [ -f /etc/resolv.conf ]; then
+		if [ "$RESOLV_CONF" != "/etc/resolv.conf" ]; then
+			echo $"resolv.conf points to $RESOLV_CONF"
+		else
+			echo $"resolv.conf exists"
+		fi
+	else
+		create
+	fi
+}
+
+disable() {
+	systemctl disable --now systemd-resolved.service
+}
+
+purge() {
+	need_root
+	if rpm -q systemd-resolved > /dev/null; then
+		echo $"systemd-resolved present, removing..."
+		dnf remove systemd-resolved
+	else
+		echo $"Not present."
+	fi
+}
+
+help() {
+cat << EOF
+Usage: ${0} [disable|purge|help]
+
+Tests resolv.conf and removes
+EOF
+}
+
+case "$ACTION" in
+	""|auto) auto;;
+	disable|stop)
+		auto
+		disable;;
+	purge|remove)
+		auto
+		purge;;
+	help|--help|-h) help;;
+esac
