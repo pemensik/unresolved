@@ -1,11 +1,11 @@
 Name:           unresolved
 Version:        0.1
 Release:        1%{?dist}
-Summary:        Remove systemd-resolved and have working network
+Summary:        Remove systemd-resolved and have still working network
 
 License:        GPLv3
-URL:            TODO
-Source0:        unresolved
+URL:            https://github.com/pemensik/unresolved
+Source0:        https://raw.githubusercontent.com/pemensik/unresolved/main/unresolved
 
 Requires:       systemd
 BuildArch:      noarch
@@ -14,6 +14,14 @@ BuildArch:      noarch
 Simple tool fixing DNS resolution on system, when systemd-resolved
 is no longer welcome. Disable or unistall the service, but also fix
 network resolution to working state.
+
+%package force
+Summary:        Keep systemd-resolved out of your system
+Conflicts:      systemd-resolved
+
+%description force
+Make sure systemd-resolved is not allowed back to the system.
+Use unresolved purge to uninstall it first.
 
 %prep
 %autopatch -p1
