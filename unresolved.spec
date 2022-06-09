@@ -32,7 +32,7 @@ Use unresolved purge to uninstall it first.
 :
 
 %install
-install -m 755 %{SOURCE0} -D %{buildroot}%{_sbindir}/unresolved
+install -m 755 %{SOURCE0} -pD %{buildroot}%{_sbindir}/unresolved
 
 %files
 %license LICENSE
