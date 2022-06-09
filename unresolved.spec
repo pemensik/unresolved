@@ -18,6 +18,7 @@ network resolution to working state.
 %package force
 Summary:        Keep systemd-resolved out of your system
 Conflicts:      systemd-resolved
+BuildArch:      noarch
 
 %description force
 Make sure systemd-resolved is not allowed back to the system.
@@ -38,6 +39,8 @@ install -m 755 %{SOURCE0} -D %{buildroot}%{_sbindir}/unresolved
 %doc README.md
 %{_sbindir}/unresolved
 
+%files force
+%license LICENSE
 
 %changelog
 * Sat Jun 04 2022 Petr Menšík <pemensik@redhat.com> - 0.1-1
