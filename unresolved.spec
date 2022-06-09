@@ -5,7 +5,7 @@ Summary:        Remove systemd-resolved and have still working network
 
 License:        GPLv3
 URL:            https://github.com/pemensik/unresolved
-Source0:        https://raw.githubusercontent.com/pemensik/unresolved/main/unresolved
+Source0:	%{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 
 Requires:       systemd
 BuildArch:      noarch
@@ -24,7 +24,7 @@ Make sure systemd-resolved is not allowed back to the system.
 Use unresolved purge to uninstall it first.
 
 %prep
-%autopatch -p1
+%autosetup -p1
 
 
 %build
