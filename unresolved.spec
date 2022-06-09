@@ -5,7 +5,7 @@ Summary:        Remove systemd-resolved and have still working network
 
 License:        GPLv3
 URL:            https://github.com/pemensik/unresolved
-Source0:	%{url}/archive/v%{version}/%{name}-%{version}.tar.gz
+Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
 
 Requires:       systemd
 BuildArch:      noarch
@@ -39,7 +39,6 @@ install -m 755 %{SOURCE0} -D %{buildroot}%{_sbindir}/unresolved
 %{_sbindir}/unresolved
 
 
-
 %changelog
-* Sat Jun 04 2022 Petr Menšík <pemensik@redhat.com>
-- 
+* Sat Jun 04 2022 Petr Menšík <pemensik@redhat.com> - 0.1-1
+- initial version
