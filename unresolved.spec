@@ -1,11 +1,15 @@
+%global forgeurl0 %{url}
+
 Name:           unresolved
 Version:        0.1
-Release:        1%{?dist}
+Release:        %autorelease
 Summary:        Remove systemd-resolved and have still working network
 
 License:        GPLv3
 URL:            https://github.com/pemensik/unresolved
-Source0:        %{url}/archive/v%{version}/%{name}-%{version}.tar.gz
+
+%forgemeta
+Source0:        %{forgesource0}
 
 Requires:       systemd
 BuildArch:      noarch
@@ -25,8 +29,7 @@ Make sure systemd-resolved is not allowed back to the system.
 Use unresolved purge to uninstall it first.
 
 %prep
-%autosetup -p1
-
+%forgeautosetup -p1
 
 %build
 :
@@ -43,5 +46,4 @@ install -m 755 %{SOURCE0} -pD %{buildroot}%{_sbindir}/unresolved
 %license LICENSE
 
 %changelog
-* Sat Jun 04 2022 Petr Menšík <pemensik@redhat.com> - 0.1-1
-- initial version
+%autochangelog
